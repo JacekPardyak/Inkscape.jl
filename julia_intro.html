@@ -94,154 +94,234 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<section id="parametric-plots" class="level2">
-<h2 class="anchored" data-anchor-id="parametric-plots">Parametric Plots</h2>
-<p>Plot function pair (x(u), y(u)). See <a href="#fig-parametric">Figure&nbsp;1</a> for an example.</p>
+<section id="odlot" class="level2">
+<h2 class="anchored" data-anchor-id="odlot">Odlot</h2>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Printf</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sin, </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>     <span class="fu">x-&gt;sin</span>(<span class="fl">2</span>x), </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>     <span class="fl">0</span>, </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>     <span class="fl">2</span>π, </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     leg<span class="op">=</span><span class="cn">false</span>, </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>     fill<span class="op">=</span>(<span class="fl">0</span>,<span class="op">:</span>lavender))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">f</span>(url)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  ext <span class="op">=</span> <span class="st">".svg"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  svg <span class="op">=</span> <span class="fu">tempname</span>() <span class="op">*</span> ext</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">download</span>(url, svg)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  inkscape <span class="op">=</span> <span class="st">"inkscape"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  command <span class="op">=</span> <span class="st">"--system-data-directory"</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  path <span class="op">=</span> <span class="fu">read</span>(<span class="ss">`$inkscape $command`</span>, <span class="dt">String</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  path <span class="op">=</span> <span class="fu">replace</span>(path, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span><span class="op">=&gt;</span><span class="st">""</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  path</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  inkscape_extensions_path <span class="op">=</span> path <span class="op">*</span> <span class="st">"</span><span class="sc">\\</span><span class="st">extensions"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  inkscape_extensions_path</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  inkscape_python_home  <span class="op">=</span> <span class="fu">replace</span>(path, <span class="st">"</span><span class="sc">\\</span><span class="st">share</span><span class="sc">\\</span><span class="st">inkscape"</span><span class="op">=&gt;</span><span class="st">""</span>) <span class="op">*</span> <span class="st">"</span><span class="sc">\\</span><span class="st">bin"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  inkscape_python_home</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  inkscape_extension_name <span class="op">=</span> <span class="st">"dxf12_outlines.py"</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  inkscape_extension_path <span class="op">=</span> inkscape_extensions_path <span class="op">*</span> <span class="st">"</span><span class="sc">\\</span><span class="st">"</span> <span class="op">*</span> inkscape_extension_name </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  ext <span class="op">=</span> <span class="st">".dxf"</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  dxf <span class="op">=</span> <span class="fu">tempname</span>() <span class="op">*</span> ext</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  dxf</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  ext <span class="op">=</span> <span class="st">".bat"</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  con <span class="op">=</span> <span class="fu">tempname</span>() <span class="op">*</span> ext</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  con</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="co">#\ n </span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">#  python.exe "%s" --output="%s"  "%s"'</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  text <span class="op">=</span> <span class="pp">@sprintf</span> <span class="st">"@ECHO OFF </span><span class="sc">\n</span><span class="st"> cd </span><span class="sc">\"</span><span class="st">%s</span><span class="sc">\"</span><span class="st"> </span><span class="sc">\n</span><span class="st"> python.exe </span><span class="sc">\"</span><span class="st">%s</span><span class="sc">\"</span><span class="st"> --output=</span><span class="sc">\"</span><span class="st">%s</span><span class="sc">\"</span><span class="st"> </span><span class="sc">\"</span><span class="st">%s</span><span class="sc">\"\n</span><span class="st">"</span> inkscape_python_home inkscape_extension_path dxf svg</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  text</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">open</span>(con, <span class="st">"w"</span>) <span class="cf">do</span> file</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">write</span>(con, text)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(<span class="ss">`$con`</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  ext <span class="op">=</span> <span class="st">".R"</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  rscript <span class="op">=</span> <span class="fu">tempname</span>() <span class="op">*</span> ext</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  rscript</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  ext <span class="op">=</span> <span class="st">".geojson"</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  geojson <span class="op">=</span> <span class="fu">tempname</span>() <span class="op">*</span> ext</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  geojson</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  dxf_r  <span class="op">=</span> <span class="fu">replace</span>(dxf, <span class="st">"</span><span class="sc">\\</span><span class="st">"</span><span class="op">=&gt;</span><span class="st">"//"</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  geojson_r  <span class="op">=</span> <span class="fu">replace</span>(geojson, <span class="st">"</span><span class="sc">\\</span><span class="st">"</span><span class="op">=&gt;</span><span class="st">"//"</span>)</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  rtext <span class="op">=</span> <span class="pp">@sprintf</span> <span class="st">"#!/usr/bin/env Rscript </span><span class="sc">\n</span><span class="st">df = sf::st_read(</span><span class="sc">\"</span><span class="st">%s</span><span class="sc">\"</span><span class="st">) </span><span class="sc">\n</span><span class="st">df = df[</span><span class="sc">\"</span><span class="st">geometry</span><span class="sc">\"</span><span class="st">] </span><span class="sc">\n</span><span class="st">sf::st_write(df, dsn = </span><span class="sc">\"</span><span class="st">%s</span><span class="sc">\"</span><span class="st">, layer = </span><span class="sc">\"</span><span class="st">jl.geojson</span><span class="sc">\"</span><span class="st">, append = FALSE) </span><span class="sc">\n</span><span class="st">"</span> dxf_r geojson_r</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  rtext</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">open</span>(rscript, <span class="st">"w"</span>) <span class="cf">do</span> file</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">write</span>(rscript, rtext)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  <span class="cf">end</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  Rscript <span class="op">=</span> <span class="st">"Rscript"</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run</span>(<span class="ss">`$Rscript $rscript`</span>)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  geojson</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="kw">end</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output-display">
-<div id="fig-parametric" class="quarto-figure quarto-figure-center anchored">
-<figure class="figure">
-<p><img src="julia_intro_files/figure-html/fig-parametric-J1.png" class="img-fluid figure-img" width="300"></p>
-<figcaption class="figure-caption">Figure&nbsp;1: Parametric Plots</figcaption>
-</figure>
-</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>f (generic function with 1 method)</code></pre>
 </div>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system</span>(<span class="st">'inkscape --system-data-directory'</span>, <span class="at">intern =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "C:\\PROGRA~1\\Inkscape\\share\\inkscape"</code></pre>
-</div>
-</div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Linking to GEOS 3.11.2, GDAL 3.6.2, PROJ 9.2.0; sf_use_s2() is TRUE</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>url <span class="ot">=</span> <span class="st">"https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg"</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>input <span class="ot">=</span> <span class="st">"data.svg"</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(url, <span class="at">destfile =</span> input)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>input_file_path <span class="ot">=</span> <span class="fu">tempfile</span>(<span class="st">"inx_"</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">file.copy</span>(input, input_file_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>path <span class="ot">=</span> <span class="fu">system</span>(<span class="st">'inkscape --system-data-directory'</span>, <span class="at">intern =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>inkscape_extensions_path <span class="ot">=</span> <span class="fu">paste</span>(path, <span class="st">"</span><span class="sc">\\</span><span class="st">extensions"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>inkscape_python_home  <span class="ot">=</span> <span class="fu">paste</span>(<span class="fu">gsub</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">share</span><span class="sc">\\</span><span class="st">inkscape"</span>, <span class="st">""</span>, path, <span class="at">fixed =</span> T), <span class="st">"</span><span class="sc">\\</span><span class="st">bin"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>inkscape_extension_name <span class="ot">=</span> <span class="st">"dxf12_outlines.py"</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>ext <span class="ot">=</span> <span class="st">".dxf"</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>output <span class="ot">=</span> <span class="fu">tempfile</span>(<span class="st">"inx_"</span>, <span class="at">fileext =</span> ext)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  con  <span class="ot">=</span> <span class="fu">tempfile</span>(<span class="at">pattern =</span> <span class="st">"inx_"</span>, <span class="at">fileext =</span> <span class="st">".bat"</span>)</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  fmt <span class="ot">=</span> <span class="st">'@ECHO OFF</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">cd %s</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="st">python.exe "%s" --output="%s"  "%s"'</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  text <span class="ot">=</span> <span class="fu">sprintf</span>(fmt,</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                 inkscape_python_home,</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">paste</span>(inkscape_extensions_path, inkscape_extension_name, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\\</span><span class="st">"</span>),</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                 output,</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                 input_file_path)</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">writeLines</span>(text, con)</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="fu">system</span>(con)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>output</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "C:\\Users\\Jacek\\AppData\\Local\\Temp\\RtmpctTfdt\\inx_25b81e5f48fb.dxf"</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_read</span>(output) <span class="sc">%&gt;%</span> <span class="fu">select</span>(geometry)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#import Pkg; Pkg.add(["GeoJSON", "Pipe"])</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span>, <span class="bu">GeoJSON</span>, <span class="bu">DataFrames</span>, <span class="bu">Pipe</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@pipe</span> <span class="st">"https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg"</span> <span class="op">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  GeoJSON.<span class="fu">read</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">DataFrame</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  _.geometry <span class="op">|&gt;</span> </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `entities' from data source 
-  `C:\Users\Jacek\AppData\Local\Temp\RtmpctTfdt\inx_25b81e5f48fb.dxf' 
-  using driver `DXF'
+  `C:\Users\jacek\AppData\Local\Temp\jl_oVEVa3m7k7.dxf' using driver `DXF'
 Simple feature collection with 192 features and 6 fields
 Geometry type: LINESTRING
 Dimension:     XY
 Bounding box:  xmin: 0 ymin: -0.007905 xmax: 40.51824 ymax: 26.08796
-CRS:           NA</code></pre>
-</div>
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span> sf<span class="sc">::</span><span class="fu">st_write</span>(<span class="at">dsn =</span> <span class="st">"data.geojson"</span>, <span class="at">layer =</span> <span class="st">"jl.geojson"</span>, <span class="at">append =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>writing: substituting ENGCRS["Undefined Cartesian SRS with unknown unit"] for missing CRS</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in CPL_write_ogr(obj, dsn, layer, driver,
-as.character(dataset_options), : GDAL Error 6: DeleteLayer() not supported by
-this dataset.</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Deleting layer not supported by driver `GeoJSON'
-Deleting layer `jl.geojson' failed
-Writing layer `jl.geojson' to data source `data.geojson' using driver `GeoJSON'
-Updating existing layer jl.geojson
+CRS:           NA
+Writing layer `jl.geojson' to data source 
+  `C://Users//jacek//AppData//Local//Temp//jl_k36p6tipsb.geojson' using driver `GeoJSON'
 Writing 192 features with 0 fields and geometry type Line String.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="julia_intro_files/figure-html/unnamed-chunk-3-J1.png" class="img-fluid" width="300"></p>
 </div>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Pkg; Pkg</span>.<span class="fu">add</span>([<span class="st">"GeoJSON"</span>, <span class="st">"Pipe"</span>])</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span>, <span class="bu">GeoJSON</span>, <span class="bu">DataFrames</span>, <span class="bu">Pipe</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@pipe</span> <span class="st">"data.geojson"</span> <span class="op">|&gt;</span> </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  GeoJSON.<span class="fu">read</span>(_) <span class="op">|&gt;</span> </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">DataFrame</span>(_) <span class="op">|&gt;</span> </span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  _.geometry <span class="op">|&gt;</span> </span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#import Pkg; Pkg.add(["GeoJSON", "Pipe"])</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span>, <span class="bu">GeoJSON</span>, <span class="bu">DataFrames</span>, <span class="bu">Pipe</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@pipe</span> <span class="st">"https://upload.wikimedia.org/wikipedia/commons/1/1b/R_logo.svg"</span> <span class="op">|&gt;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  GeoJSON.<span class="fu">read</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">DataFrame</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  _.geometry <span class="op">|&gt;</span> </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `entities' from data source 
+  `C:\Users\jacek\AppData\Local\Temp\jl_KFSh6xsjAp.dxf' using driver `DXF'
+Simple feature collection with 301 features and 6 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 0.239712 ymin: 0.512699 xmax: 191.0289 ymax: 147.6373
+CRS:           NA
+Writing layer `jl.geojson' to data source 
+  `C://Users//jacek//AppData//Local//Temp//jl_AvEjoRGXK7.geojson' using driver `GeoJSON'
+Writing 301 features with 0 fields and geometry type Line String.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="julia_intro_files/figure-html/unnamed-chunk-4-J1.png" class="img-fluid" width="300"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#import Pkg; Pkg.add(["GeoJSON", "Pipe"])</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">Plots</span>, <span class="bu">GeoJSON</span>, <span class="bu">DataFrames</span>, <span class="bu">Pipe</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="pp">@pipe</span> <span class="st">"https://upload.wikimedia.org/wikipedia/commons/0/0d/Inkscape_Logo.svg"</span> <span class="op">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  GeoJSON.<span class="fu">read</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">DataFrame</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  _.geometry <span class="op">|&gt;</span> </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `entities' from data source 
+  `C:\Users\jacek\AppData\Local\Temp\jl_8n0HwdipqP.dxf' using driver `DXF'
+Simple feature collection with 1073 features and 6 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 2.127826 ymin: 2.37445 xmax: 31.75242 ymax: 31.94792
+CRS:           NA
+Writing layer `jl.geojson' to data source 
+  `C://Users//jacek//AppData//Local//Temp//jl_wVIhyh0x8f.geojson' using driver `GeoJSON'
+Writing 1073 features with 0 fields and geometry type Line String.</code></pre>
+</div>
 <div class="cell-output-display">
 <p><img src="julia_intro_files/figure-html/unnamed-chunk-5-J1.png" class="img-fluid" width="300"></p>
+</div>
+</div>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> <span class="bu">Pkg; Pkg</span>.<span class="fu">add</span>([<span class="st">"GeoJSON"</span>, <span class="st">"Pipe"</span>, <span class="st">"SpecialFunctions"</span>])</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">using</span> <span class="bu">SpecialFunctions</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> <span class="pp">@pipe</span> <span class="st">"https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg"</span> <span class="op">|&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">f</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  GeoJSON.<span class="fu">read</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">DataFrame</span>(_) <span class="op">|&gt;</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  _.geometry</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `entities' from data source 
+  `C:\Users\jacek\AppData\Local\Temp\jl_WnClGvY9C7.dxf' using driver `DXF'
+Simple feature collection with 192 features and 6 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 0 ymin: -0.007905 xmax: 40.51824 ymax: 26.08796
+CRS:           NA
+Writing layer `jl.geojson' to data source 
+  `C://Users//jacek//AppData//Local//Temp//jl_aZiDyxuf2V.geojson' using driver `GeoJSON'
+Writing 192 features with 0 fields and geometry type Line String.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>192-element Vector{GeoJSON.LineString{2, Float32}}:
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ ⋮
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries
+ 2D LineStringwith 2 sub-geometries</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">xₜ</span>(t)  <span class="op">=</span><span class="fl">100</span> <span class="op">*</span> <span class="fu">sin</span>(t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>xₜ (generic function with 1 method)</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">yₜ</span>(t)  <span class="op">=</span><span class="fl">100</span> <span class="op">*</span> <span class="fu">sin</span>(<span class="fl">2</span>t)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>yₜ (generic function with 1 method)</code></pre>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(xₜ, yₜ, <span class="fl">0</span>, <span class="fl">2</span>π, leg<span class="op">=</span><span class="cn">false</span>, fill<span class="op">=</span>(<span class="fl">0</span>,<span class="op">:</span>orange))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="julia_intro_files/figure-html/unnamed-chunk-6-J1.png" class="img-fluid" width="300"></p>
+</div>
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot!</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="julia_intro_files/figure-html/unnamed-chunk-6-J2.png" class="img-fluid" width="300"></p>
 </div>
 </div>
 </section>
