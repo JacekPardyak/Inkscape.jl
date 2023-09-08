@@ -1,0 +1,230 @@
+---
+title: "Julia Plots"
+format:
+  html:
+    code-fold: true
+---
+
+```{r}
+```
+
+## Odlot
+
+```{julia}
+# oryginal script function
+using Printf
+
+function f(url)
+  ext = ".svg"
+  svg = tempname() * ext
+  download(url, svg)
+  inkscape = "inkscape"
+  command = "--system-data-directory"
+  path = read(`$inkscape $command`, String)
+  path = replace(path, "\n"=>"")
+  path
+  inkscape_extensions_path = path * "\\extensions"
+  inkscape_extensions_path
+  inkscape_python_home  = replace(path, "\\share\\inkscape"=>"") * "\\bin"
+  inkscape_python_home
+  inkscape_extension_name = "dxf12_outlines.py"
+  inkscape_extension_path = inkscape_extensions_path * "\\" * inkscape_extension_name 
+  ext = ".dxf"
+  dxf = tempname() * ext
+  dxf
+  ext = ".bat"
+  con = tempname() * ext
+  con
+  #\ n 
+#  python.exe "%s" --output="%s"  "%s"'
+  text = @sprintf "@ECHO OFF \n cd \"%s\" \n python.exe \"%s\" --output=\"%s\" \"%s\"\n" inkscape_python_home inkscape_extension_path dxf svg
+  text
+  open(con, "w") do file
+    write(con, text)
+  end
+  run(`$con`)
+  ext = ".R"
+  rscript = tempname() * ext
+  rscript
+  
+  ext = ".geojson"
+  geojson = tempname() * ext
+  geojson
+  dxf_r  = replace(dxf, "\\"=>"//")
+  geojson_r  = replace(geojson, "\\"=>"//")
+  
+  rtext = @sprintf "#!/usr/bin/env Rscript \ndf = sf::st_read(\"%s\") \ndf = df[\"geometry\"] \nsf::st_write(df, dsn = \"%s\", layer = \"jl.geojson\", append = FALSE) \n" dxf_r geojson_r
+  rtext
+  
+  open(rscript, "w") do file
+    write(rscript, rtext)
+  end
+  Rscript = "Rscript"
+  run(`$Rscript $rscript`)
+  print(dxf)
+  geojson
+  
+end
+
+```
+
+
+```{julia}
+#import Pkg; Pkg.add(["GeoJSON", "Pipe"])
+using Plots, ArchGDAL, DataFrames, Pipe, Printf
+
+function svg2dxf(url)
+  svg = tempname() * ".svg"
+  download(url, svg)
+  inkscape = "inkscape"
+  command = "--system-data-directory"
+  path = read(`$inkscape $command`, String)
+  path = replace(path, "\n"=>"")
+  inkscape_python_home  = replace(path, "\\share\\inkscape"=>"") * "\\bin"
+  inkscape_extension_name = "dxf12_outlines.py"
+  inkscape_extension_path = path * "\\extensions\\" * inkscape_extension_name 
+  dxf = tempname() * ".dxf"
+  bat = tempname() * ".bat"
+  text = @sprintf "@ECHO OFF \n cd \"%s\" \n python.exe \"%s\" --output=\"%s\" \"%s\"\n" inkscape_python_home inkscape_extension_path dxf svg
+  text
+  open(bat, "w") do file
+    write(bat, text)
+  end
+  run(`$bat`)
+  replace(dxf, "\\"=>"//")
+end
+
+@pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" |> 
+  plot
+```
+
+
+
+
+
+```{julia}
+@pipe "https://upload.wikimedia.org/wikipedia/commons/1/1b/R_logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" |> 
+  plot
+#ArchGDAL.write(dataset, "C://Users//Jacek//AppData//Local//Temp//jl_1.geojson")
+#GeoJSON.write(dataset, "C://Users//Jacek//AppData//Local//Temp//jl_1.geojson")
+```
+
+
+```{julia}
+#import Pkg; Pkg.add(["GeoJSON", "Pipe", "SpecialFunctions"])
+
+df = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" 
+
+
+xₜ(t)  =100 * sin(t)
+yₜ(t)  =100 * sin(2t)
+
+
+
+plot(xₜ, yₜ, 0, 2π, leg=false, fill=(0,:orange))
+plot!(df)
+
+```
+
+
+```{julia}
+df = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" 
+
+using Luxor, Colors
+Drawing(200, 200)
+origin()
+background("white")
+sethue("black")
+randompoints = [Point(rand(-100:100), rand(-100:100)) for i in 1:10]
+randompoints
+
+poly(randompoints, :fill)
+finish()
+#preview()
+
+df[1:4] |> plot
+#df[5:24] |> plot!
+#df[25:53] |> plot!
+df[1:4]
+```
+
+
+
+
+
+```{julia}
+#import Pkg; Pkg.add(["GeoJSON", "Pipe", "SpecialFunctions"])
+
+df = @pipe "https://upload.wikimedia.org/wikipedia/commons/2/25/Elvispresley-logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" 
+
+
+#xₜ(t)  =100 * sin(t)
+#yₜ(t)  =100 * sin(2t)
+#plot(xₜ, yₜ, 0, 2π, leg=false, fill=(0,:orange))
+plot(df, c=:black, linewidth=1)
+
+```
+
+```{julia}
+#import Pkg; Pkg.add("Turf")
+dataset = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  f(_) |> ArchGDAL.read(_)
+  
+#  svg2dxf(_) |> 
+#  ArchGDAL.read(_) |>
+#  ArchGDAL.getlayer(_, 0) |>
+#  DataFrame(_) |>
+#  _.""
+  
+#using Turf, Plots
+#poly = Polygon([[ [-81, 41], [-81, 47], [-72, 47], [-72, 41], [-81, 41]]])
+#plot(poly)
+
+layer = ArchGDAL.getlayer(dataset, 0)
+ArchGDAL.getfeature(layer, 1) do feature
+    print(feature)
+end
+
+df = DataFrames.DataFrame(ArchGDAL.getlayer(dataset, 0))
+df[1, ""]
+
+
+ArchGDAL.union(df[1, ""], df[2, ""])
+
+
+#polygon = ArchGDAL.createpolygon()
+#for i in 1:4
+#    ring = df[i, ""]
+#    ArchGDAL.addgeom!(polygon, ring)
+#end
+
+#polygon |> plot
+#Polygon(df[1:4])
+# https://yeesian.com/ArchGDAL.jl/stable/geometries/#Geometry-Modification
+```
+
