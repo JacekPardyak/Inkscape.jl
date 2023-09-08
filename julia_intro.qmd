@@ -71,7 +71,7 @@ end
 
 ```{julia}
 #import Pkg; Pkg.add(["GeoJSON", "Pipe"])
-using Plots, GeoJSON, DataFrames, Pipe, Printf
+using Plots, ArchGDAL, DataFrames, Pipe, Printf
 
 function svg2dxf(url)
   svg = tempname() * ".svg"
@@ -143,10 +143,35 @@ plot!(df)
 
 
 ```{julia}
+df = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" 
+
+using Luxor, Colors
+Drawing(200, 200)
+origin()
+background("white")
+sethue("black")
+randompoints = [Point(rand(-100:100), rand(-100:100)) for i in 1:10]
+randompoints
+
+poly(randompoints, :fill)
+finish()
+#preview()
+
 df[1:4] |> plot
-df[5:24] |> plot!
-df[25:53] |> plot!
+#df[5:24] |> plot!
+#df[25:53] |> plot!
+df[1:4]
 ```
+
+
+
+
+
 ```{julia}
 #import Pkg; Pkg.add(["GeoJSON", "Pipe", "SpecialFunctions"])
 
@@ -164,3 +189,42 @@ df = @pipe "https://upload.wikimedia.org/wikipedia/commons/2/25/Elvispresley-log
 plot(df, c=:black, linewidth=1)
 
 ```
+
+```{julia}
+#import Pkg; Pkg.add("Turf")
+dataset = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  f(_) |> ArchGDAL.read(_)
+  
+#  svg2dxf(_) |> 
+#  ArchGDAL.read(_) |>
+#  ArchGDAL.getlayer(_, 0) |>
+#  DataFrame(_) |>
+#  _.""
+  
+#using Turf, Plots
+#poly = Polygon([[ [-81, 41], [-81, 47], [-72, 47], [-72, 41], [-81, 41]]])
+#plot(poly)
+
+layer = ArchGDAL.getlayer(dataset, 0)
+ArchGDAL.getfeature(layer, 1) do feature
+    print(feature)
+end
+
+df = DataFrames.DataFrame(ArchGDAL.getlayer(dataset, 0))
+df[1, ""]
+
+
+ArchGDAL.union(df[1, ""], df[2, ""])
+
+
+#polygon = ArchGDAL.createpolygon()
+#for i in 1:4
+#    ring = df[i, ""]
+#    ArchGDAL.addgeom!(polygon, ring)
+#end
+
+#polygon |> plot
+#Polygon(df[1:4])
+# https://yeesian.com/ArchGDAL.jl/stable/geometries/#Geometry-Modification
+```
+
