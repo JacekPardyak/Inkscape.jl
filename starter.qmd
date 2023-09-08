@@ -14,9 +14,6 @@ Plot function pair (x(u), y(u)).
 See @fig-parametric for an example.
 
 
-```{julia}
-using Pkg; Pkg.add("PkgTemplates")
-```
 
 
 
