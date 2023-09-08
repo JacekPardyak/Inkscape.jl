@@ -11,6 +11,7 @@ format:
 ## Odlot
 
 ```{julia}
+# oryginal script function
 using Printf
 
 function f(url)
@@ -60,7 +61,9 @@ function f(url)
   end
   Rscript = "Rscript"
   run(`$Rscript $rscript`)
+  print(dxf)
   geojson
+  
 end
 
 ```
@@ -68,13 +71,35 @@ end
 
 ```{julia}
 #import Pkg; Pkg.add(["GeoJSON", "Pipe"])
-using Plots, GeoJSON, DataFrames, Pipe
+using Plots, GeoJSON, DataFrames, Pipe, Printf
+
+function svg2dxf(url)
+  svg = tempname() * ".svg"
+  download(url, svg)
+  inkscape = "inkscape"
+  command = "--system-data-directory"
+  path = read(`$inkscape $command`, String)
+  path = replace(path, "\n"=>"")
+  inkscape_python_home  = replace(path, "\\share\\inkscape"=>"") * "\\bin"
+  inkscape_extension_name = "dxf12_outlines.py"
+  inkscape_extension_path = path * "\\extensions\\" * inkscape_extension_name 
+  dxf = tempname() * ".dxf"
+  bat = tempname() * ".bat"
+  text = @sprintf "@ECHO OFF \n cd \"%s\" \n python.exe \"%s\" --output=\"%s\" \"%s\"\n" inkscape_python_home inkscape_extension_path dxf svg
+  text
+  open(bat, "w") do file
+    write(bat, text)
+  end
+  run(`$bat`)
+  replace(dxf, "\\"=>"//")
+end
 
 @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
-  f(_) |> 
-  GeoJSON.read(_) |> 
-  DataFrame(_) |> 
-  _.geometry |> 
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" |> 
   plot
 ```
 
@@ -83,41 +108,27 @@ using Plots, GeoJSON, DataFrames, Pipe
 
 
 ```{julia}
-#import Pkg; Pkg.add(["GeoJSON", "Pipe"])
-using Plots, GeoJSON, DataFrames, Pipe
-
 @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1b/R_logo.svg" |>
-  f(_) |> 
-  GeoJSON.read(_) |> 
-  DataFrame(_) |> 
-  _.geometry |> 
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" |> 
   plot
+#ArchGDAL.write(dataset, "C://Users//Jacek//AppData//Local//Temp//jl_1.geojson")
+#GeoJSON.write(dataset, "C://Users//Jacek//AppData//Local//Temp//jl_1.geojson")
 ```
 
 
 ```{julia}
-#import Pkg; Pkg.add(["GeoJSON", "Pipe"])
-using Plots, GeoJSON, DataFrames, Pipe
-
-@pipe "https://upload.wikimedia.org/wikipedia/commons/0/0d/Inkscape_Logo.svg" |>
-  f(_) |> 
-  GeoJSON.read(_) |> 
-  DataFrame(_) |> 
-  _.geometry |> 
-  plot
-```
-
-
-```{julia}
-import Pkg; Pkg.add(["GeoJSON", "Pipe", "SpecialFunctions"])
-
-using SpecialFunctions
+#import Pkg; Pkg.add(["GeoJSON", "Pipe", "SpecialFunctions"])
 
 df = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
-  f(_) |> 
-  GeoJSON.read(_) |> 
-  DataFrame(_) |> 
-  _.geometry
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" 
 
 
 xₜ(t)  =100 * sin(t)
@@ -127,5 +138,29 @@ yₜ(t)  =100 * sin(2t)
 
 plot(xₜ, yₜ, 0, 2π, leg=false, fill=(0,:orange))
 plot!(df)
+
+```
+
+
+```{julia}
+df[1:4] |> plot
+df[5:24] |> plot!
+df[25:53] |> plot!
+```
+```{julia}
+#import Pkg; Pkg.add(["GeoJSON", "Pipe", "SpecialFunctions"])
+
+df = @pipe "https://upload.wikimedia.org/wikipedia/commons/2/25/Elvispresley-logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" 
+
+
+#xₜ(t)  =100 * sin(t)
+#yₜ(t)  =100 * sin(2t)
+#plot(xₜ, yₜ, 0, 2π, leg=false, fill=(0,:orange))
+plot(df, c=:black, linewidth=1)
 
 ```
