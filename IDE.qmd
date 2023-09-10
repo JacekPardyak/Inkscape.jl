@@ -24,7 +24,170 @@ t = Template(;
 t("Inkscape.jl")
 ```
 
+```{julia}
+import Pkg; Pkg.add(["ArchGDAL", "DataFrames", "Pipe", "GeoDataFrames", "Luxor"])
+using Plots, ArchGDAL, DataFrames, Pipe, Printf, GeoDataFrames
 
+function svg2dxf(url)
+  svg = tempname() * ".svg"
+  download(url, svg)
+  inkscape = "inkscape"
+  command = "--system-data-directory"
+  path = read(`$inkscape $command`, String)
+  path = replace(path, "\n"=>"")
+  inkscape_python_home  = replace(path, "\\share\\inkscape"=>"") * "\\bin"
+  inkscape_extension_name = "dxf12_outlines.py"
+  inkscape_extension_path = path * "\\extensions\\" * inkscape_extension_name 
+  dxf = tempname() * ".dxf"
+  bat = tempname() * ".bat"
+  text = @sprintf "@ECHO OFF \n cd \"%s\" \n python.exe \"%s\" --output=\"%s\" \"%s\"\n" inkscape_python_home inkscape_extension_path dxf svg
+  text
+  open(bat, "w") do file
+    write(bat, text)
+  end
+  run(`$bat`)
+  replace(dxf, "\\"=>"//")
+end
+
+@pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |> 
+  _.""  |>
+  DataFrame(geometry=_) |>
+  GeoDataFrames.write("output.geojson", _)
+
+@pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |> 
+  _.""  |>
+  DataFrame(geometry=_) |>
+  GeoDataFrames.write("output.shp", _)
+
+@pipe "output.geojson" |>
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |>
+  _."" |>
+  plot
+
+df = @pipe "https://upload.wikimedia.org/wikipedia/commons/1/1f/Julia_Programming_Language_Logo.svg" |>
+  svg2dxf(_) |> 
+  ArchGDAL.read(_) |>
+  ArchGDAL.getlayer(_, 0) |>
+  DataFrame(_) |> 
+  _.""  |>
+  DataFrame(geometry=_) 
+```
+
+
+```{julia}
+function make_poly(x, s, e)
+  local res =  ArchGDAL.createlinestring()
+  for i in s:e
+    res = ArchGDAL.union(res, x[i, "geometry"])
+  end
+  res = ArchGDAL.polygonize(res)
+  res = ArchGDAL.getgeom(res, 0)
+  res
+end
+
+l  = @pipe df |> make_poly(_, 1, 4) #192
+j_ = @pipe df |> make_poly(_, 5, 24) 
+j  = @pipe df |> make_poly(_, 25, 53) 
+u  = @pipe df |> make_poly(_, 54, 77) 
+i_ = @pipe df |> make_poly(_, 78, 93) 
+i__  = @pipe df |> make_poly(_, 94, 110) 
+i___  = @pipe df |> make_poly(_, 111, 131) 
+i  = @pipe df |> make_poly(_, 132, 136) 
+a  = @pipe df |> make_poly(_, 137, 147) 
+a_  = @pipe df |> make_poly(_, 148, 192) 
+
+#ArchGDAL.difference(a, a_) |> plot
+l  |> plot
+j_ |> plot!
+j  |> plot!
+u  |> plot!
+i_ |> plot!
+i__ |> plot!
+i___ |> plot!
+i |> plot!
+a_ |> plot!
+a |> plot!
+```
+
+
+```{julia}
+vec = [l, j_, j, u, i_, i__, i___, i, a_, a]
+hue = ["#000000", "#4d64ae", "#000000", "#000000", "#ca3c32", "#9259a3", "#399746", "#000000", "#000000", "#FFFFFF"]
+@pipe DataFrame(geometry=vec, colour = hue) |>
+  GeoDataFrames.write("output1.shp", _)
+
+```
+
+```{julia}
+using Shapefile, Luxor
+include(joinpath(dirname(pathof(Luxor)), "readshapefiles.jl"))
+worldshapefile = "output1.shp"
+
+worldshapes = open(worldshapefile) do f
+    read(f, Shapefile.Handle)
+end
+
+function drawairportmap(data)
+    Drawing(4000, 2000)
+    origin()
+    scale(10, 10)
+    setline(1.0)
+    #fontsize(0.075)
+    gsave()
+    #setopacity(0.25)
+    background("#FFFFFF")
+    i = 1
+    for shape in data.shapes
+        pgons, bbox = convert(Array{Luxor.Point, 1}, shape)
+        for pgon in pgons
+            sethue(hue[i])
+            poly(pgon, :fill)
+            i = i + 1
+        end
+    end
+    grestore()
+    sethue("black")
+    finish()
+    preview()
+end
+drawairportmap(worldshapes)
+```
+```{julia}
+worldshapes = open(worldshapefile) do f
+    read(f, Shapefile.Handle)
+end
+worldshapes
+```
+
+```{julia}
+vec = [(0.,0.), (0.,1.), (1.,1.)]
+simplepolygon = ArchGDAL.createpolygon(vec)
+```
+```{julia}
+ ArchGDAL.union(point, df[2]) |> plot
+
+res =  ArchGDAL.createlinestring()
+for i in 1:4
+  res = ArchGDAL.union(res, df[i])
+end
+res
+
+#ArchGDAL.polygonize(df[1:4])
+```
+```{julia}
+
+
+```
 
 
 ```{julia}
