@@ -48,7 +48,7 @@ function make_poly_n(x, s, e)
   res
 end
 
-df = @pipe "https://upload.wikimedia.org/wikipedia/commons/2/26/Nicolaus_Copernicus_Signature.svg" |>
+df = @pipe "https://raw.githubusercontent.com/JacekPardyak/Inkscape.jl/master/data/Taras_Shevchenko%E2%80%99s_signature.svg" |>
   svg2dxf(_) |> 
   ArchGDAL.read(_) |>
   ArchGDAL.getlayer(_, 0) |>
@@ -88,10 +88,11 @@ end
 using Shapefile, Luxor
 include(joinpath(dirname(pathof(Luxor)), "readshapefiles.jl"))
 
-hue = ["#000000", "#0000FF", "#0000FF", "#0000FF", "#0000FF",
-       "#0000FF", "#0000FF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
-       "#FFFFFF", "#000000", "#0000FF", "#FFFFFF", "#FFFFFF",
-       "#000000", "#000000", "#0000FF", "#FFFFFF", "#000000",
+hue = ["#000000", "#0000FF", "#0000FF", "#0000FF", "#FFFFFF",
+       "#FFFFFF", "#FFFFFF", "#000000", "#0000FF", "#0000FF",
+       "#0000FF", "#FFFFFF", "#FFFFFF", "#0000FF", "#000000",
+       "#0000FF", "#0000FF", "#0000FF", "#0000FF", "#0000FF",
+       "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
        "#000000"]
 sig = open("sig.shp") do f
     read(f, Shapefile.Handle)
@@ -99,10 +100,8 @@ end
 
 function draw_sig(x)
     Drawing(4000, 2000)
-    origin()
-    scale(10, 10)
-    setline(1.0)
-    #fontsize(0.075)
+    origin(Point(20, 1700))
+    scale(12, 12)
     gsave()
     #setopacity(0.25)
     background("#FFFFFF")
