@@ -171,17 +171,13 @@ end
 
 ```{julia}
 df = @pipe "https://upload.wikimedia.org/wikipedia/commons/3/30/Den_Haag_wapen.svg" |>
-  svg2dxf(_) |> 
+  inx_extension(_, "dxf12_outlines.py", ".dxf") |> 
   ArchGDAL.read(_) |>
   ArchGDAL.getlayer(_, 0) |>
   DataFrame(_) |> 
   _.""  |>
   DataFrame(geometry=_)
 df.geometry |> plot
-
-#  |> 
-#  _.""  |>
-#  DataFrame(geometry=_)
 ```
 
 ## Using Inkscape Actions
