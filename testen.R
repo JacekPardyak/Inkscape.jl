@@ -1,7 +1,0 @@
-library(JuliaCall)
-julia_setup(installJulia = TRUE)
-julia <- julia_setup()
-julia_command("a = sqrt(2);"); julia_eval("a")
-julia_command("using GeoDataFrames")
-julia_help("GeoDataFrames.write")
-julia_source("script.jl")
