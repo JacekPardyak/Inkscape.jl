@@ -5,4 +5,3 @@ using Test
     @test Inkscape.greet_your_package_name() == "Hello Inkscape!"
     @test Inkscape.greet_your_package_name() != "Hello world!"
 end
-end
