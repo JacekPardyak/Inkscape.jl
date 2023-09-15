@@ -1,3 +1,5 @@
+using Printf
+
 function inx_install_lin()
   bat = tempname() * ".sh"
   text = "#!/bin/bash
