@@ -1,7 +1,9 @@
 using Printf
 
-function greet_your_package_name()
-    println("Hello Inkscape!")
+function inx_version()
+  inkscape = "inkscape"; command = "--version"
+  read(`$inkscape $command`, String)
+#    println("Hello Inkscape!")
 end
 
 function is_url(x)

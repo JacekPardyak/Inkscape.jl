@@ -2,6 +2,6 @@ using Inkscape
 using Test
 
 @testset "Inkscape.jl" begin
-    @test Inkscape.greet_your_package_name() == "Hello Inkscape!"
-    @test Inkscape.greet_your_package_name() != "Hello world!"
+    @test Inkscape.inx_version() == "Hello Inkscape!"
+    @test Inkscape.inx_version() != "Hello world!"
 end

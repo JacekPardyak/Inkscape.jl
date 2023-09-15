@@ -1,7 +1,7 @@
 module Inkscape
 
 import Printf
-export greet_your_package_name
+export inx_version
 export is_url
 export inx_actions
 export inx_extension
