@@ -20,3 +20,11 @@ function inx_install_win()
   run(`$c1 $c2 $c3 $c4 $c5`)
   println("Inkscape has been installed")
 end
+
+function inx_isurl(x)
+  re = r"^https?://"
+  occursin(re, x)
+end
+
+
+

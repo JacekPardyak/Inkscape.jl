@@ -13,11 +13,6 @@ function inx_version()
   read(`$inkscape $command`, String)
 end
 
-function is_url(x)
-  re = r"^https?://"
-  occursin(re, x)
-end
-
 function inx_actions(input, actions, ext)
   input_file_path = tempname() * ".svg"
   if is_url(input)
