@@ -54,7 +54,7 @@ end
 
 function inx_extension_win(input, inkscape_extension_name, ext)
   input_file_path = tempname() * ".svg"
-  if is_url(input)
+  if inx_isurl(input)
     download(input, input_file_path)
   else
     cp(input, input_file_path)
