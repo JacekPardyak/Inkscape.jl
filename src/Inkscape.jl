@@ -1,5 +1,11 @@
 module Inkscape
 
+# utils
+export inx_install_lin
+export inx_install_win
+include("utils.jl")
+
+# functions
 import Printf
 export inx_install
 export inx_version
