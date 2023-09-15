@@ -14,12 +14,12 @@ inkscape --version"
   c1 = "chmod"; c2 =  "+x"
   run(`$c1 $c2 $bat`)
   run(`$bat`)
+  println("Inkscape has been installed")
 end
 
 function inx_version()
   inkscape = "inkscape"; command = "--version"
   read(`$inkscape $command`, String)
-#    println("Hello Inkscape!")
 end
 
 function is_url(x)
