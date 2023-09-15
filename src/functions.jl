@@ -15,7 +15,7 @@ end
 
 function inx_actions(input, actions, ext)
   input_file_path = tempname() * ".svg"
-  if is_url(input)
+  if inx_isurl(input)
     download(input, input_file_path)
   else
     cp(input, input_file_path)
@@ -31,7 +31,7 @@ end
 
 function inx_extension(input, inkscape_extension_name, ext)
   input_file_path = tempname() * ".svg"
-  if is_url(input)
+  if inx_isurl(input)
     download(input, input_file_path)
   else
     cp(input, input_file_path)
