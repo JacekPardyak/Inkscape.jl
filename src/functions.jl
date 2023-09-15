@@ -30,25 +30,9 @@ function inx_actions(input, actions, ext)
 end
 
 function inx_extension(input, inkscape_extension_name, ext)
-  input_file_path = tempname() * ".svg"
-  if inx_isurl(input)
-    download(input, input_file_path)
+  @static if Sys.iswindows()
+    inx_extension_win(input, inkscape_extension_name, ext)
   else
-    cp(input, input_file_path)
+    inx_extension_lin(input, inkscape_extension_name, ext)
   end
-  inkscape = "inkscape"
-  command = "--system-data-directory"
-  path = read(`$inkscape $command`, String)
-  path = replace(path, "\n"=>"")
-  inkscape_extension_path = path * "/extensions/" * inkscape_extension_name
-  output = tempname() * ext
-  bat = tempname() * ".sh"
-  text = @sprintf "#!/bin/bash \n python3 \"%s\" --output=\"%s\" \"%s\"\n" inkscape_extension_path output input_file_path
-  open(bat, "w") do file
-    write(bat, text)
-  end
-  c1 = "chmod"; c2 =  "+x" 
-  run(`$c1 $c2 $bat`)
-  run(`$bat`)
-  output
 end
