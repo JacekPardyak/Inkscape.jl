@@ -44,7 +44,7 @@ inx_actions(input, actions, ext)
 `actions` is any logical sequence of actions from over 1000 available.
 Full list <https://jacekpardyak.github.io/inkscape.jl/>
 
-`ext` is an extension of the output file from over 10 available. Full
+`ext` is an extension of the output file from over 20 available. Full
 list
 <https://inkscape.org/learn/faq/#what-formats-can-inkscape-importexport>
 
