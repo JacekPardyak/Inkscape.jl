@@ -29,10 +29,10 @@ function inx_actions(input, actions, ext)
   output
 end
 
-function inx_extension(input, inkscape_extension_name, ext)
+function inx_extension(input, inkscape_extension_name, options, ext)
   @static if Sys.iswindows()
-    inx_extension_win(input, inkscape_extension_name, ext)
+    inx_extension_win(input, inkscape_extension_name, options, ext)
   else
-    inx_extension_lin(input, inkscape_extension_name, ext)
+    inx_extension_lin(input, inkscape_extension_name, options, ext)
   end
 end

@@ -28,7 +28,7 @@ function inx_isurl(x)
   occursin(re, x)
 end
 
-function inx_extension_lin(input, extension, ext)
+function inx_extension_lin(input, extension, options, ext)
   input_file_path = tempname() * ".svg"
   if inx_isurl(input)
     download(input, input_file_path)
@@ -42,7 +42,7 @@ function inx_extension_lin(input, extension, ext)
   inkscape_extension_path = path * "/extensions/" * extension
   output = tempname() * ext
   bat = tempname() * ".sh"
-  text = @sprintf "#!/bin/bash \n python3 \"%s\" --output=\"%s\" \"%s\"\n" inkscape_extension_path output input_file_path
+  text = @sprintf "#!/bin/bash \n python3 \"%s\" --output=\"%s\" %s \"%s\"\n" inkscape_extension_path output options input_file_path
   open(bat, "w") do file
     write(bat, text)
   end
@@ -52,7 +52,7 @@ function inx_extension_lin(input, extension, ext)
   output
 end
 
-function inx_extension_win(input, extension, ext)
+function inx_extension_win(input, extension, options, ext)
   input_file_path = tempname() * ".svg"
   if inx_isurl(input)
     download(input, input_file_path)
@@ -67,7 +67,7 @@ function inx_extension_win(input, extension, ext)
   inkscape_extension_path = path * "\\extensions\\" * extension 
   output = tempname() * ext
   bat = tempname() * ".bat"
-  text = @sprintf "@ECHO OFF \n cd \"%s\" \n python.exe \"%s\" --output=\"%s\" \"%s\"\n" inkscape_python_home inkscape_extension_path output input_file_path
+  text = @sprintf "@ECHO OFF \n cd \"%s\" \n python.exe \"%s\" --output=\"%s\" %s \"%s\"\n" inkscape_python_home inkscape_extension_path output options input_file_path
   open(bat, "w") do file
     write(bat, text)
   end
